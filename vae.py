@@ -10,25 +10,23 @@ import tflearn
 def encode(input_data, hidden_dim, latent_dim=None):
     with tf.variable_op_scope([input_data], 'encoder') as scope:
         
-        encoder = tflearn.fully_connected(input_data, hidden_dim, activation='relu')
-        
+        encoder = tflearn.fully_connected(input_data, hidden_dim, activation='relu') 
         encoder = tflearn.fully_connected(encoder, hidden_dim, activation='relu')
 
-        mean = tflearn.fully_connected(encoder, latent_dim)
-        log_var = tflearn.fully_connected(encoder, latend_dim)
+        mu = tflearn.fully_connected(encoder, latent_dim, name='network_mu')
+        log_var = tflearn.fully_connected(encoder, latent_dim, name='network_logvar')
         std = tf.exp(0.5 * log_var)
         random_sample = tf.random_normal(tf.shape(log_var))
-        z = tf.add(mean, tf.mul(std, random_sample))
+        z = tf.add(mu, tf.mul(std, random_sample))
 
-    return z, mean, log_var
+    return z, mu, log_var
 
 
-def decode(input_data, hidden_dim=None, original=None):
-    with tf.variable_op_scope([input_data, 'decoder']) as scope:
-        decoder = tf.fully_connected(input_data, hidden_dim, activation='relu')
+def decode(input_data, hidden_dim=None, original_shape=None):
+    with tf.variable_op_scope([input_data], 'decoder') as scope:
+        decoder = tflearn.fully_connected(input_data, hidden_dim, activation='relu', name='latent_input')
+        decoder = tflearn.fully_connected(decoder, hidden_dim, activation='relu',name='decoder_hidden1')
 
-        decoder = tflearn.fully_connected(decoder, hidden_dim, activation='relu')
-
-        mean = tflearn.fully_connected(decoder, original[0], activation='sigmoid')
+        mean = tflearn.fully_connected(decoder, original_shape[0], activation='sigmoid', name='original_hat')
 
     return mean
