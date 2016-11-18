@@ -8,7 +8,7 @@ import tflearn
 
 
 def encode(input_data, hidden_dim, latent_dim=None):
-    with tf.variable_op_scope([input_data], 'encoder') as scope:
+    with tf.variable_op_scope([input_data], 'encoder'):
         
         encoder = tflearn.fully_connected(input_data, hidden_dim, activation='relu') 
         encoder = tflearn.fully_connected(encoder, hidden_dim, activation='relu')
@@ -23,7 +23,7 @@ def encode(input_data, hidden_dim, latent_dim=None):
 
 
 def decode(input_data, hidden_dim=None, original_shape=None):
-    with tf.variable_op_scope([input_data], 'decoder') as scope:
+    with tf.variable_op_scope([input_data], 'decoder'):
         decoder = tflearn.fully_connected(input_data, hidden_dim, activation='relu', name='latent_input')
         decoder = tflearn.fully_connected(decoder, hidden_dim, activation='relu',name='decoder_hidden1')
 
