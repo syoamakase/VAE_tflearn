@@ -52,22 +52,6 @@ with tf.Graph().as_default():
 
 digit_size = 28
 n = 15
-linspace = 1000
-figure = np.zeros((digit_size * n, digit_size * n))
-grid_x = np.linspace(-linspace, linspace, n)
-grid_y = np.linspace(-linspace, linspace, n)
-
-for i, yi in enumerate(grid_x):
-    for j, xi in enumerate(grid_y):
-        z_sample = np.array([[xi, yi] + [0 for k in range(2, latent_dim)]])
-        x_decoded = generator.predict(z_sample)
-        digit = np.reshape(x_decoded[0], [digit_size, digit_size])
-        figure[i * digit_size : (i + 1) * digit_size,
-               j * digit_size : (j + 1) * digit_size] = digit
-figure *= 255
-figure = figure.astype(np.uint8)
-
-io.imsave('vae_z.png', figure)
 
 figure = np.ndarray(shape=(digit_size * (n), digit_size * (n)),
                     dtype=np.float16)
