@@ -7,11 +7,11 @@ import tensorflow as tf
 import tflearn
 
 class Latent():
-	def __init__(self):
-		self.mu = None
-		self.log_var = None
-		self.pi = None
-		self.std = None
+    def __init__(self):
+        self.mu = None
+        self.log_var = None
+        self.pi = None
+        self.std = None
 
 
 def encode(input_data, hidden_dim, latent_dim=None, mixture_num=1):
@@ -22,21 +22,23 @@ def encode(input_data, hidden_dim, latent_dim=None, mixture_num=1):
 
         latents = []
         for mn in range(mixture_num):
-        	latent = Latent()
-        	latent.mu = tflearn.fully_connected(encoder, latent_dim, name='network_mu'+str(mn))
-        	latent.log_var = tflearn.fully_connected(encoder, latent_dim, name='network_logvar'+str(mn))
-        	latent.pi = tflearn.fully_connected(encoder, latent_dim, name='network_pi'+str(mn))
-        	latent.std = tf.exp(0.5 * latent.log_var)
-        	latents.append(latent)
+            latent = Latent()
+            latent.mu = tflearn.fully_connected(encoder, latent_dim, name='network_mu'+str(mn))
+            latent.log_var = tflearn.fully_connected(encoder, latent_dim, name='network_logvar'+str(mn))
+            latent.pi = tflearn.fully_connected(encoder, latent_dim, name='network_pi'+str(mn))
+            latent.std = tf.exp(0.5 * latent.log_var)
+            latents.append(latent)
 
-        print(latents)
         random_sample = tf.random_normal(tf.shape(latents[0].log_var))
-        # pi_weight1 = pi1 / (pi1 + pi2) 
-        # pi_weight2 = pi2 / (pi1 + pi2)
-        # z = tf.add(tf.add(pi_weight1 * mu1,  pi_weight2 * mu2), tf.mul(tf.add(pi_weight1 * std1, pi_weight2 * std2), random_sample))
-        z = tf.add(latents[0].mu, tf.mul(latents[0].std, random_sample))
+        for latent in latents:
+            norm_pi = latent.pi / pi_all
+            mu_all = tf.add(mu_all, tf.add(mu_all, norl_pi * latent.mu))
+            std_all = tf,add(std_all, tf.mul(tf.add(norl_pi* latent.std, random_sample)))
+            # z = tf.add(tf.add(pi_weight1 * mu1,  pi_weight2 * mu2), tf.mul(tf.add(pi_weight1 * std1, pi_weight2 * std2), random_sample))
 
-    return z, latent
+        z = tf.add(mu_all, std_all)
+
+    return z, latents
 
 
 def decode(input_data, hidden_dim=None, original_shape=None):
